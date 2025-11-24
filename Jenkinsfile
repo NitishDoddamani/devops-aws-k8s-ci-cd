@@ -2,22 +2,22 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = 'dockerhub-creds'   // Jenkins credentials ID
+        DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
         DOCKER_IMAGE = 'nitishdoddamani/sample-node-app'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/<your-username>/devops-aws-k8s-ci-cd.git'
+                checkout scm
             }
         }
 
         stage('Build app') {
             steps {
                 dir('app') {
-                    sh 'npm install'
-                    sh 'npm test || echo "no tests yet"'
+                    bat 'npm install'
+                    bat 'npm test || exit 0'
                 }
             }
         }
@@ -25,9 +25,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 dir('app') {
-                    script {
-                        sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
-                    }
+                    bat "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
                 }
             }
         }
@@ -38,13 +36,11 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS,
                                                      usernameVariable: 'DOCKER_USER',
                                                      passwordVariable: 'DOCKER_PASS')]) {
-                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-                        sh "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                        bat 'docker login -u %DOCKER_USER% -p %DOCKER_PASS%'
+                        bat "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
                     }
                 }
             }
         }
-
-        // Later we will add 'Deploy to EKS' stage here
     }
 }
