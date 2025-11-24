@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/nitishdoddamani/devops-aws-k8s-ci-cd.git'
+                git branch: 'main', url: 'https://github.com/NitishDoddamani/devops-aws-k8s-ci-cd.git'
             }
         }
 
