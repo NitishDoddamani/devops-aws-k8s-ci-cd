@@ -16,8 +16,8 @@ pipeline {
         stage('Build app') {
             steps {
                 dir('app') {
-                    sh 'npm install'
-                    sh 'npm test || echo "no tests yet"'
+                    bat 'npm install'
+                    bat 'npm test || echo "no tests yet"'
                 }
             }
         }
